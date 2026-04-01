@@ -32,6 +32,27 @@ export class CommentService {
     };
   }
 
+  async getLatestComments(page: number, size?: number) {
+    const pageSize = size || AppConfig.PAGINATION.SIZE_DEFAUT;
+    const p = Math.max(1, Number(page) || 1);
+    const skip = (p - 1) * pageSize;
+    
+    const [data, total] = await Promise.all([
+      this.commentRepo.getLatestComments(skip, pageSize),
+      this.commentRepo.countTotalComments()
+    ]);
+
+    return {
+      meta: {
+        page: p,
+        size: pageSize,
+        totalElements: total,
+        totalPages: Math.ceil(total / pageSize)
+      },
+      data
+    };
+  }
+
   async update(id: string, commentDto: UpdateCommentDto, user: Partial<IUserRequest>) {
     checkMongoId(id);
     await this.assertIsOwner(id, user.userId);

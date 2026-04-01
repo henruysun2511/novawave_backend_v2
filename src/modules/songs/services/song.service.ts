@@ -34,7 +34,7 @@ export class SongService {
     private readonly fanoutFollowerProducer: FanoutFollowerProducer,
 
     @InjectConnection() private readonly connection: Connection
-  ) {}
+  ) { }
 
   async create(songDto: CreateSongDto, user: IUserRequest) {
     // Kiểm tra explicit, lyrics
@@ -546,7 +546,7 @@ export class SongService {
     const topByTime = await this.songRepo.getTopSongsByTimeFrame(limit, startDate);
 
     // FLAT dữ liệu: Chuyển từ [{ song: {...}, listenCount: 10 }] thành [{ ...song, views: 10 }]
-    return topByTime.map((item) => ({
+    return topByTime.map(item => ({
       ...item.song,
       views: item.listenCount // Ghi đè views tổng bằng views theo khung giờ để hiển thị
     }));

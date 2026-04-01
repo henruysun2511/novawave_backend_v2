@@ -55,6 +55,27 @@ export class CommentRepository {
       .exec();
   }
 
+  // Lấy danh sách bình luận mới nhất kèm thông tin user và song
+  async getLatestComments(skip: number, size: number): Promise<Comment[] | []> {
+    return await this.commentRepo
+      .find({ deleted: false })
+      .populate('userId', 'username avatar')
+      .populate('songId', 'name imageUrl')
+      .skip(skip)
+      .limit(size)
+      .select('content userId songId createdAt')
+      .sort({ createdAt: -1 })
+      .lean()
+      .exec();
+  }
+
+  // Đếm tổng số bình luận chưa bị xóa
+  async countTotalComments() {
+    return this.commentRepo.countDocuments({
+      deleted: false
+    });
+  }
+
   //Xóa
   async remove(_id: string, userId: string): Promise<void> {
     await this.commentRepo.updateOne({ _id }, { deleted: true, deletedAt: new Date(), deletedBy: userId });

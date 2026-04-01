@@ -15,6 +15,12 @@ export class CommentController {
     return this.commentService.create(commentDto, { userId: user.userId });
   }
 
+  @Get('latest/list')
+  @ResponseMessage('Lấy danh sách bình luận mới nhất thành công')
+  getLatestComments(@Query('page') page: number, @Query('size') size: number) {
+    return this.commentService.getLatestComments(page, size);
+  }
+
   @Get(':id')
   @ResponseMessage('Lấy danh sách bình luận thành công')
   getCommentsOfSongForClient(@Param('id') id: string, @Query('page') page: number) {
