@@ -24,7 +24,7 @@ export class CommentRepository {
         songId: songId,
         deleted: false
       })
-      .select('_id content userId songId createdAt')
+      .select('_id content userId songId createdAt playbackPositionSec')
       .populate('userId', '_id username avatar')
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -50,7 +50,7 @@ export class CommentRepository {
       .populate('userId', 'username avatar')
       .skip(skip)
       .limit(size)
-      .select('content userId createdAt')
+      .select('content userId createdAt playbackPositionSec')
       .lean()
       .exec();
   }
@@ -63,7 +63,7 @@ export class CommentRepository {
       .populate('songId', 'name imageUrl')
       .skip(skip)
       .limit(size)
-      .select('content userId songId createdAt')
+      .select('content userId songId createdAt playbackPositionSec')
       .sort({ createdAt: -1 })
       .lean()
       .exec();

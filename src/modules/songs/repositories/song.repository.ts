@@ -311,6 +311,7 @@ export class SongRepository {
           _id: 1,
           name: 1,
           mp3Link: 1,
+          lyrics: 1,
           duration: 1,
           imageUrl: 1,
           artistId: 1,

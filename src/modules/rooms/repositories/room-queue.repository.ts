@@ -20,7 +20,11 @@ export class RoomQueueRepository {
   async findById(id: string) {
     return this.queueRepo
       .findOne({ _id: id, deleted: false })
-      .populate('songId', '_id name imageUrl duration artistId')
+      .populate({
+        path: 'songId',
+        select: '_id name imageUrl mp3Link lyrics duration artistId',
+        populate: { path: 'artistId', select: '_id name avatarUrl' }
+      })
       .populate('requestedBy', '_id username avatar')
       .populate('approvedBy', '_id username avatar')
       .lean()
@@ -38,7 +42,11 @@ export class RoomQueueRepository {
 
     return this.queueRepo
       .find(filter)
-      .populate('songId', '_id name imageUrl duration artistId')
+      .populate({
+        path: 'songId',
+        select: '_id name imageUrl mp3Link lyrics duration artistId',
+        populate: { path: 'artistId', select: '_id name avatarUrl' }
+      })
       .populate('requestedBy', '_id username avatar')
       .populate('approvedBy', '_id username avatar')
       .sort({ order: 1, createdAt: 1 })
@@ -47,7 +55,17 @@ export class RoomQueueRepository {
   }
 
   async update(id: string, queueData: Partial<RoomQueueItem>) {
-    return this.queueRepo.findByIdAndUpdate(id, { $set: queueData }, { new: true }).lean().exec();
+    return this.queueRepo
+      .findByIdAndUpdate(id, { $set: queueData }, { new: true })
+      .populate({
+        path: 'songId',
+        select: '_id name imageUrl mp3Link lyrics duration artistId',
+        populate: { path: 'artistId', select: '_id name avatarUrl' }
+      })
+      .populate('requestedBy', '_id username avatar')
+      .populate('approvedBy', '_id username avatar')
+      .lean()
+      .exec();
   }
 
   async getMaxOrder(roomId: string) {

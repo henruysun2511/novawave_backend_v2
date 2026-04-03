@@ -12,6 +12,10 @@ export class Comment extends TimestampSchema {
 
   @Prop({ type: String, required: true })
   content: string;
+
+  // thời điểm nghe (tính bằng giây) khi gửi comment, optional
+  @Prop({ type: Number, required: false })
+  playbackPositionSec?: number;
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);

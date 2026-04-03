@@ -560,8 +560,9 @@ export class RoomService {
   private async playNext(roomId: string, userId: string) {
     const currentPlaying = await this.roomQueueRepo.findCurrentPlaying(roomId);
 
+    let previousPlayingUpdated: unknown = null;
     if (currentPlaying) {
-      await this.roomQueueRepo.update(String(currentPlaying._id), {
+      previousPlayingUpdated = await this.roomQueueRepo.update(String(currentPlaying._id), {
         status: RoomQueueItemStatus.PLAYED,
         updatedBy: userId
       });
@@ -604,6 +605,10 @@ export class RoomService {
       room: updated,
       queueItem: playingItem
     });
+    if (previousPlayingUpdated) {
+      this.roomGateway.broadcastQueueUpdated(roomId, previousPlayingUpdated);
+    }
+    this.roomGateway.broadcastQueueUpdated(roomId, playingItem);
 
     return updated;
   }
