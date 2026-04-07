@@ -102,9 +102,10 @@ export class RoomGateway implements OnGatewayConnection {
     this.server.to(this.getRoomChannel(roomId)).emit('USER_LEFT', payload);
   }
 
-  notifyNewRequest(roomId: string, payload: unknown, hostId: string) {
+  notifyNewRequest(roomId: string, payload: unknown, _hostId: string) {
+    // Chỉ emit vào room channel - host đã ở trong room channel nên sẽ nhận được
+    // Không emit thêm vào host private channel để tránh host nhận 2 lần
     this.server.to(this.getRoomChannel(roomId)).emit('NEW_REQUEST_NOTIFICATION', payload);
-    this.server.to(`host_${hostId}`).emit('NEW_REQUEST_NOTIFICATION', payload);
   }
 
   broadcastParticipantModerated(roomId: string, payload: unknown) {
