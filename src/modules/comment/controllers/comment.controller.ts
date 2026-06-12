@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
-import { ResponseMessage, User } from 'shared/decorators/customize';
+import { Public, ResponseMessage, User } from 'shared/decorators/customize';
 import { IUserRequest } from 'shared/interfaces';
 
 import { CommentService } from '../services/comment.service';
@@ -7,7 +7,7 @@ import { CreateCommentDto, UpdateCommentDto } from '../dtos';
 
 @Controller('comments')
 export class CommentController {
-  constructor(private readonly commentService: CommentService) {}
+  constructor(private readonly commentService: CommentService) { }
 
   @Post()
   @ResponseMessage('Tạo bình luận thành công')
@@ -15,6 +15,7 @@ export class CommentController {
     return this.commentService.create(commentDto, { userId: user.userId });
   }
 
+  @Public()
   @Get('latest/list')
   @ResponseMessage('Lấy danh sách bình luận mới nhất thành công')
   getLatestComments(@Query('page') page: number, @Query('size') size: number) {

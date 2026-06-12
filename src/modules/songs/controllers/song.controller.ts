@@ -14,52 +14,6 @@ import { SongService } from '../services/song.service';
 export class SongController {
   constructor(private readonly songService: SongService) { }
 
-  @Get('stream-local/:id')
-  @Public()
-  @ResponseMessage('Stream song local (Test Plan 1 - Heavy I/O)')
-  async streamLocal(@Param('id') id: string, @Res() res: Response) {
-    // 1. Truy vấn DB trực tiếp (tốn tài nguyên hơn dùng Cache)
-    const song = await this.songService.getDetail(id);
-    if (!song) throw new NotFoundException('Bài hát không tồn tại');
-
-    const fileName = `${id}.mp3`;
-    const uploadDir = join(process.cwd(), 'uploads', 'songs');
-    const filePath = join(uploadDir, fileName);
-
-    // Đảm bảo thư mục tồn tại
-    if (!existsSync(uploadDir)) {
-      const fs = require('fs');
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
-    // 2. TÁC VỤ NẶNG: Nếu chưa có file local thì download từ Cloudinary về
-    // Điều này gây tốn Network Bandwidth và Disk Write I/O của server
-    if (!existsSync(filePath)) {
-      try {
-        const writer = createWriteStream(filePath);
-        const response = await axios.get(song.mp3Link as string, {
-          responseType: 'stream'
-        });
-        await pipeline(response.data, writer);
-      } catch (error) {
-        throw new NotFoundException('Không thể tải file từ Cloudinary');
-      }
-    }
-
-    // 3. TÁC VỤ NẶNG: Server tự đọc disk và stream bytes
-    // Server phải giữ một socket mở và liên tục đọc ổ cứng để pipe dữ liệu
-    const fs = require('fs');
-    const stat = fs.statSync(filePath);
-
-    res.setHeader('Content-Type', 'audio/mpeg');
-    res.setHeader('Content-Length', stat.size);
-    res.setHeader('Accept-Ranges', 'bytes');
-
-    const fileStream = createReadStream(filePath);
-
-    // Pipe sẽ chiếm dụng bộ nhớ đệm (buffer) của Node.js khi có hàng ngàn user cùng lúc
-    fileStream.pipe(res);
-  }
 
   @ResponseMessage('Đăng bài hát thành công')
   @Post('')
@@ -93,6 +47,7 @@ export class SongController {
     return await this.songService.updateStatus(statusDto, user.userId);
   }
 
+  @Public()
   @Get('leaderboard')
   @Public()
   @ResponseMessage('Lấy bảng xếp hạng thành công')

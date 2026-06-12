@@ -34,7 +34,7 @@ export class SongService {
     private readonly fanoutFollowerProducer: FanoutFollowerProducer,
 
     @InjectConnection() private readonly connection: Connection
-  ) {}
+  ) { }
 
   async create(songDto: CreateSongDto, user: IUserRequest) {
     // Kiểm tra explicit, lyrics
@@ -397,6 +397,8 @@ export class SongService {
       data
     };
   }
+
+
 
   async getDetail(id: string) {
     checkMongoId(id);
